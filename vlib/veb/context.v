@@ -262,9 +262,15 @@ pub fn (ctx &Context) get_cookie(key string) ?string {
 
 // Sets a cookie
 pub fn (mut ctx Context) set_cookie(cookie http.Cookie) {
-	cookie_raw := cookie.str()
+	// Ensure valid cookie path
+	mut cookie_send := cookie
+	if cookie_send.path == '' {
+		cookie_send.path = '/'
+	}
+
+	cookie_raw := cookie_send.str()
 	if cookie_raw == '' {
-		eprintln('[veb] error setting cookie: name of cookie is invalid.\n${cookie}')
+		eprintln('[veb] error setting cookie: name of cookie is invalid.\n${cookie_send}')
 		return
 	}
 	ctx.res.header.add(.set_cookie, cookie_raw)
